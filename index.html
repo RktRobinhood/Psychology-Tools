@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IB Psychology 2027 - Master Batch Marker</title>
+    <title>IB Psychology 2027 - High-Context Master Suite</title>
 <style>
     :root {
         --nav-width: 270px;
@@ -15,7 +15,7 @@
         --text-muted: #64748b;
     }
 
-    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; margin: 0; display: flex; background: #f8fafc; color: var(--text-main); }
+    body { font-family: 'Inter', -apple-system, system-ui, sans-serif; margin: 0; display: flex; background: #f8fafc; color: var(--text-main); }
 
     /* SIDEBAR */
     #sidebar { width: var(--nav-width); height: 100vh; background: var(--dark-bg); color: white; position: fixed; overflow-y: auto; z-index: 1000; }
@@ -24,7 +24,7 @@
     
     .nav-cat { padding: 15px 20px 5px; font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.2px; font-weight: 700; }
     #sidebar ul { list-style: none; padding: 0; margin: 0; }
-    #sidebar li a { display: block; padding: 10px 20px; color: #cbd5e1; text-decoration: none; font-size: 0.85rem; cursor: pointer; transition: 0.2s; border-left: 3px solid transparent; }
+    #sidebar li a { display: block; padding: 10px 25px; color: #cbd5e1; text-decoration: none; font-size: 0.85rem; cursor: pointer; transition: 0.2s; border-left: 3px solid transparent; }
     #sidebar li a:hover { background: #1e293b; color: white; }
     #sidebar li a.active { background: var(--ib-blue); color: white; border-left: 3px solid #fff; }
 
@@ -32,7 +32,7 @@
     .container { margin-left: var(--nav-width); padding: 40px; width: calc(100% - var(--nav-width)); max-width: 950px; padding-bottom: 180px; box-sizing: border-box; }
     .view { display: none; }
     .view.active { display: block; animation: fadeIn 0.2s ease; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
     .guide-ref { font-size: 0.75rem; color: var(--ib-blue); font-weight: bold; text-transform: uppercase; margin-bottom: 5px; display: block; }
     h1 { font-size: 1.6rem; color: var(--dark-bg); border-bottom: 2px solid var(--ib-blue); padding-bottom: 10px; margin: 0 0 10px; }
@@ -96,7 +96,7 @@
     </ul>
     <div class="nav-cat">Paper 3</div>
     <ul>
-        <li><a onclick="nav('p3q1')" id="btn-p3q1">P3-Q1: Graph Skill</a></li>
+        <li><a onclick="nav('p3q1')" id="btn-p3q1">P3-Q1: Data Issue</a></li>
         <li><a onclick="nav('p3q2')" id="btn-p3q2">P3-Q2: Conclusion</a></li>
         <li><a onclick="nav('p3q3')" id="btn-p3q3">P3-Q3: Ethics</a></li>
         <li><a onclick="nav('p3q4')" id="btn-p3q4">P3-Q4: Synthesis</a></li>
@@ -111,14 +111,13 @@
         <li><a onclick="nav('help')" id="btn-help">Help & Pedagogy</a></li>
     </ul>
     <div style="padding: 10px 20px;">
-        <button class="btn btn-orange" onclick="resetRubrics()">Reset Student Marking</button>
+        <button class="btn btn-orange" onclick="resetRubrics()">Reset Marking & Comments</button>
         <button class="btn btn-red" onclick="resetAll()">Reset All (Full Clear)</button>
     </div>
 </nav>
 
 <div class="container">
     
-    <!-- TEMPLATE FOR EACH SECTION -->
     <template id="section-header">
         <div class="context-box">
             <label>Question / Prompt being assessed</label>
@@ -195,7 +194,7 @@
         </div>
         <div class="card">
             <span class="strand-title">Terminology & Conclusion</span>
-            <label class="row-opt"><input type="radio" name="p1cs3" value="1" onchange="upd()"><span class="mark-tag">1-3</span><div class="txt-body">Terminology is <span class="kw">not used</span> or is consistently used inappropriately. Conclusion is missing or not consistent.</div></label>
+            <label class="row-opt"><input type="radio" name="p1cs3" value="1" onchange="upd()"><span class="mark-tag">1-3</span><div class="txt-body">Terminology is <span class="kw">not used</span> or is consistently used inappropriately. Conclusion is missing.</div></label>
             <label class="row-opt"><input type="radio" name="p1cs3" value="2" onchange="upd()"><span class="mark-tag">4-6</span><div class="txt-body">Terminology is used, but often <span class="kw">inappropriately</span>. A <span class="kw">simplistic conclusion</span> is included.</div></label>
             <label class="row-opt"><input type="radio" name="p1cs3" value="3" onchange="upd()"><span class="mark-tag">7-9</span><div class="txt-body">Terminology used <span class="kw">sometimes appropriately</span>. Conclusion is included but is not always <span class="kw">consistent</span>.</div></label>
             <label class="row-opt"><input type="radio" name="p1cs3" value="4" onchange="upd()"><span class="mark-tag">10-12</span><div class="txt-body">Terminology used, <span class="kw">mostly appropriately</span>. The response argues to a conclusion that is <span class="kw">consistent</span>.</div></label>
@@ -215,17 +214,17 @@
     </div><input type="number" class="manual-grade-field" id="man-p2aq1" oninput="upd()"><textarea id="comm-p2aq1" placeholder="Comment" oninput="save()"></textarea></div>
 
     <div id="p2aq2" class="view"><span class="guide-ref">Guide Page 53</span><h1>P2-A-Q2: Application</h1><div class="header-anchor"></div><div class="card"><span class="strand-title">Application (4m)</span>
-        <label class="row-opt"><input type="radio" name="p2aq2r" value="1" onchange="upd()"><span class="mark-tag">1-2</span><div class="txt-body">Knowledge is <span class="kw">relevant but limited</span>. <span class="kw">some links</span> between concept and practical.</div></label>
-        <label class="row-opt"><input type="radio" name="p2aq2r" value="2" onchange="upd()"><span class="mark-tag">3-4</span><div class="txt-body">Knowledge is <span class="kw">well developed</span>. <span class="kw">clear and detailed</span> links back to practical.</div></label>
+        <label class="row-opt"><input type="radio" name="p2aq2r" value="1" onchange="upd()"><span class="mark-tag">1-2</span><div class="txt-body">Knowledge is <span class="kw">relevant but limited</span>. <span class="kw">Some links</span> between concept and practical.</div></label>
+        <label class="row-opt"><input type="radio" name="p2aq2r" value="2" onchange="upd()"><span class="mark-tag">3-4</span><div class="txt-body">Knowledge is <span class="kw">well developed</span>. <span class="kw">Clear and detailed</span> links back to practical.</div></label>
     </div><input type="number" class="manual-grade-field" id="man-p2aq2" oninput="upd()"><textarea id="comm-p2aq2" placeholder="Comment" oninput="save()"></textarea></div>
 
-    <div id="p2aq3" class="view"><span class="guide-ref">Guide Page 53-54</span><h1>P2-A-Q3: Compare</h1><div class="header-anchor"></div><div class="card"><span class="strand-title">Comparison (6m)</span>
-        <label class="row-opt"><input type="radio" name="p2aq3r" value="1" onchange="upd()"><span class="mark-tag">1-2</span><div class="txt-body">Described in <span class="kw">limited detail</span>; errors in methodology understanding.</div></label>
+    <div id="p2aq3" class="view"><span class="guide-ref">Guide Page 53-54</span><h1>P2-A-Q3: Compare</h1><div class="header-anchor"></div><div class="card"><span class="strand-title">Methodological Detail (6m)</span>
+        <label class="row-opt"><input type="radio" name="p2aq3r" value="1" onchange="upd()"><span class="mark-tag">1-2</span><div class="txt-body">Described in <span class="kw">limited detail</span>; inaccuracies or limited terminology.</div></label>
         <label class="row-opt"><input type="radio" name="p2aq3r" value="2" onchange="upd()"><span class="mark-tag">3-4</span><div class="txt-body">Explained in <span class="kw">limited detail</span>; lacks clarity. Terminology with inaccuracies.</div></label>
         <label class="row-opt"><input type="radio" name="p2aq3r" value="3" onchange="upd()"><span class="mark-tag">5-6</span><div class="txt-body">Similarities and differences <span class="kw">discussed in detail</span>. Terminology used <span class="kw">effectively</span>.</div></label>
     </div><input type="number" class="manual-grade-field" id="man-p2aq3" oninput="upd()"><textarea id="comm-p2aq3" placeholder="Comment" oninput="save()"></textarea></div>
 
-    <div id="p2aq4" class="view"><span class="guide-ref">Guide Page 54</span><h1>P2-A-Q4: Design</h1><div class="header-anchor"></div><div class="card"><span class="strand-title">Procedure (6m)</span>
+    <div id="p2aq4" class="view"><span class="guide-ref">Guide Page 54</span><h1>P2-A-Q4: Design</h1><div class="header-anchor"></div><div class="card"><span class="strand-title">Procedure & Clarity (6m)</span>
         <label class="row-opt"><input type="radio" name="p2aq4r" value="1" onchange="upd()"><span class="mark-tag">1-2</span><div class="txt-body">The procedure is described in <span class="kw">limited detail</span>; limited use of terminology.</div></label>
         <label class="row-opt"><input type="radio" name="p2aq4r" value="2" onchange="upd()"><span class="mark-tag">3-4</span><div class="txt-body">The procedure is explained in <span class="kw">some detail but lacks clarity</span>. inaccuracies present.</div></label>
         <label class="row-opt"><input type="radio" name="p2aq4r" value="3" onchange="upd()"><span class="mark-tag">5-6</span><div class="txt-body">The procedure is explained with <span class="kw">accuracy and detail</span>. Terminology used <span class="kw">effectively</span>.</div></label>
@@ -240,7 +239,7 @@
             <span class="strand-title">Concept Understanding</span>
             <label class="row-opt"><input type="radio" name="p2bs1" value="1" onchange="upd()"><span class="mark-tag">1-3</span><div class="txt-body"><span class="kw">Little understanding</span> of specified concepts in relation to the study.</div></label>
             <label class="row-opt"><input type="radio" name="p2bs1" value="2" onchange="upd()"><span class="mark-tag">4-6</span><div class="txt-body"><span class="kw">Basic understanding</span> of at least one specified concept.</div></label>
-            <label class="row-opt"><input type="radio" name="p2bs1" value="3" onchange="upd()"><span class="mark-tag">7-9</span><div class="txt-body"><span class="kw">Some understanding</span> of concepts; link partially addressed.</div></label>
+            <label class="row-opt"><input type="radio" name="p2bs1" value="3" onchange="upd()"><span class="mark-tag">7-9</span><div class="txt-body"><span class="kw">Some understanding</span> of specified concepts. Knowledge <span class="kw">partly explained</span>.</div></label>
             <label class="row-opt"><input type="radio" name="p2bs1" value="4" onchange="upd()"><span class="mark-tag">10-12</span><div class="txt-body"><span class="kw">Good understanding</span> of at least two specified concepts.</div></label>
             <label class="row-opt"><input type="radio" name="p2bs1" value="5" onchange="upd()"><span class="mark-tag">13-15</span><div class="txt-body"><span class="kw">Very good understanding</span> of two or more specified concepts.</div></label>
         </div>
@@ -253,7 +252,7 @@
             <label class="row-opt"><input type="radio" name="p2bs2" value="5" onchange="upd()"><span class="mark-tag">13-15</span><div class="txt-body"><span class="kw">Well-developed critical analysis</span>. Effective specific references.</div></label>
         </div>
         <div class="card">
-            <span class="strand-title">Terminology & Synthesis</span>
+            <span class="strand-title">Terminology & Context</span>
             <label class="row-opt"><input type="radio" name="p2bs3" value="1" onchange="upd()"><span class="mark-tag">1-3</span><div class="txt-body">Terminology <span class="kw">not used</span> or points inaccurate. Conclusion missing.</div></label>
             <label class="row-opt"><input type="radio" name="p2bs3" value="2" onchange="upd()"><span class="mark-tag">4-6</span><div class="txt-body">Terminology used with <span class="kw">inaccuracies</span>. Simplistic conclusion included.</div></label>
             <label class="row-opt"><input type="radio" name="p2bs3" value="3" onchange="upd()"><span class="mark-tag">7-9</span><div class="txt-body">Terminology used <span class="kw">sometimes appropriately</span>. Points lack detail.</div></label>
@@ -264,7 +263,7 @@
     </div>
 
     <!-- PAPER 3 -->
-    <div id="p3q1" class="view"><span class="guide-ref">Guide Page 56</span><h1>P3-Q1: Graph Issue</h1><div class="header-anchor"></div><div class="card"><span class="strand-title">Interpretation Skill (3m)</span>
+    <div id="p3q1" class="view"><span class="guide-ref">Guide Page 56</span><h1>P3-Q1: Graph Issue</h1><div class="header-anchor"></div><div class="card"><span class="strand-title">Issue Identification (3m)</span>
         <label class="row-opt"><input type="radio" name="p3q1r" value="1" onchange="upd()"><span class="mark-tag">1</span><div class="txt-body">A relevant issue that limits interpretation is <span class="kw">identified</span>.</div></label>
         <label class="row-opt"><input type="radio" name="p3q1r" value="2" onchange="upd()"><span class="mark-tag">2</span><div class="txt-body">A relevant issue that limits interpretation is <span class="kw">clearly described</span>.</div></label>
         <label class="row-opt"><input type="radio" name="p3q1r" value="3" onchange="upd()"><span class="mark-tag">3</span><div class="txt-body">A relevant issue that limits interpretation is <span class="kw">explained</span>.</div></label>
@@ -288,34 +287,34 @@
         <div class="header-anchor"></div>
         <div class="card">
             <span class="strand-title">Integration & Interpretation</span>
-            <label class="row-opt"><input type="radio" name="p3q4s1" value="1" onchange="upd()"><span class="mark-tag">1-3</span><div class="txt-body">Knowledge is <span class="kw">anecdotal</span> or of marginal relevance. Link missing.</div></label>
-            <label class="row-opt"><input type="radio" name="p3q4s1" value="2" onchange="upd()"><span class="mark-tag">4-6</span><div class="txt-body">Knowledge interpreted with inaccuracies. <span class="kw">Limited discussion</span>.</div></label>
+            <label class="row-opt"><input type="radio" name="p3q4s1" value="1" onchange="upd()"><span class="mark-tag">1-3</span><div class="txt-body">Knowledge is <span class="kw">anecdotal</span> or of very marginal relevance. Link missing.</div></label>
+            <label class="row-opt"><input type="radio" name="p3q4s1" value="2" onchange="upd()"><span class="mark-tag">4-6</span><div class="txt-body">Relevant knowledge interpreted with inaccuracies. <span class="kw">Limited discussion</span>.</div></label>
             <label class="row-opt"><input type="radio" name="p3q4s1" value="3" onchange="upd()"><span class="mark-tag">7-9</span><div class="txt-body">Interprets at least <span class="kw">two sources</span>. Discussion of validity is <span class="kw">limited</span>.</div></label>
             <label class="row-opt"><input type="radio" name="p3q4s1" value="4" onchange="upd()"><span class="mark-tag">10-12</span><div class="txt-body">Interprets two or more sources. Discussion of validity has <span class="kw">detail</span>.</div></label>
             <label class="row-opt"><input type="radio" name="p3q4s1" value="5" onchange="upd()"><span class="mark-tag">13-15</span><div class="txt-body">Interprets at least <span class="kw">three sources effectively</span>. Detailed discussion.</div></label>
         </div>
         <div class="card">
-            <span class="strand-title">Analysis of Validity</span>
-            <label class="row-opt"><input type="radio" name="p3q4s2" value="1" onchange="upd()"><span class="mark-tag">1-3</span><div class="txt-body">Response is <span class="kw">mostly descriptive</span>. Analysis superficial.</div></label>
+            <span class="strand-title">Analysis of Claim</span>
+            <label class="row-opt"><input type="radio" name="p3q4s2" value="1" onchange="upd()"><span class="mark-tag">1-3</span><div class="txt-body">Response is <span class="kw">mostly descriptive</span>. Any analysis is superficial.</div></label>
             <label class="row-opt"><input type="radio" name="p3q4s2" value="2" onchange="upd()"><span class="mark-tag">4-6</span><div class="txt-body">Limited analysis present. Discussion of validity is <span class="kw">limited</span>.</div></label>
-            <label class="row-opt"><input type="radio" name="p3q4s2" value="3" onchange="upd()"><span class="mark-tag">7-9</span><div class="txt-body">Analysis <span class="kw">lacks development</span>. Conclusion partially supported.</div></label>
+            <label class="row-opt"><input type="radio" name="p3q4s2" value="3" onchange="upd()"><span class="mark-tag">7-9</span><div class="txt-body">Analysis <span class="kw">lacks development</span>. Conclusion only partially supported.</div></label>
             <label class="row-opt"><input type="radio" name="p3q4s2" value="4" onchange="upd()"><span class="mark-tag">10-12</span><div class="txt-body">Contains <span class="kw">critical analysis</span>. knowledge used to support.</div></label>
-            <label class="row-opt"><input type="radio" name="p3q4s2" value="5" onchange="upd()"><span class="mark-tag">13-15</span><div class="txt-body">Contains <span class="kw">well-developed critical analysis</span>. Reasoning presented.</div></label>
+            <label class="row-opt"><input type="radio" name="p3q4s2" value="5" onchange="upd()"><span class="mark-tag">13-15</span><div class="txt-body">Contains <span class="kw">well-developed critical analysis</span>. Detailed relevant knowledge.</div></label>
         </div>
         <div class="card">
             <span class="strand-title">Evaluation of Perspectives</span>
-            <label class="row-opt"><input type="radio" name="p3q4s3" value="1" onchange="upd()"><span class="mark-tag">1-3</span><div class="txt-body"><span class="kw">Little/no discussion</span> of points of view. conclusion missing.</div></label>
-            <label class="row-opt"><input type="radio" name="p3q4s3" value="2" onchange="upd()"><span class="mark-tag">4-6</span><div class="txt-body">POV discussion <span class="kw">simplistic</span>.</div></label>
-            <label class="row-opt"><input type="radio" name="p3q4s3" value="3" onchange="upd()"><span class="mark-tag">7-9</span><div class="txt-body">Different points of view <span class="kw">identified</span>.</div></label>
-            <label class="row-opt"><input type="radio" name="p3q4s3" value="4" onchange="upd()"><span class="mark-tag">10-12</span><div class="txt-body">Points of view <span class="kw">identified</span>. Argument is consistent.</div></label>
-            <label class="row-opt"><input type="radio" name="p3q4s3" value="5" onchange="upd()"><span class="mark-tag">13-15</span><div class="txt-body">Points of view <span class="kw">evaluated</span>. Reasoned conclusion.</div></label>
+            <label class="row-opt"><input type="radio" name="p3q4s3" value="1" onchange="upd()"><span class="mark-tag">1-3</span><div class="txt-body"><span class="kw">Little/no discussion</span> of different points of view. conclusion missing.</div></label>
+            <label class="row-opt"><input type="radio" name="p3q4s3" value="2" onchange="upd()"><span class="mark-tag">4-6</span><div class="txt-body">Discussion of POV <span class="kw">simplistic</span>. conclusion inconsistent.</div></label>
+            <label class="row-opt"><input type="radio" name="p3q4s3" value="3" onchange="upd()"><span class="mark-tag">7-9</span><div class="txt-body">Different points of view <span class="kw">identified</span>. conclusion partially supported.</div></label>
+            <label class="row-opt"><input type="radio" name="p3q4s3" value="4" onchange="upd()"><span class="mark-tag">10-12</span><div class="txt-body">Different points of view are <span class="kw">identified</span>. Argument is consistent.</div></label>
+            <label class="row-opt"><input type="radio" name="p3q4s3" value="5" onchange="upd()"><span class="mark-tag">13-15</span><div class="txt-body">Different points of view are <span class="kw">evaluated</span>. Reasoned conclusion.</div></label>
         </div>
         <input type="number" class="manual-grade-field" id="man-p3q4" oninput="upd()"><textarea id="comm-p3q4" placeholder="Comment" oninput="save()"></textarea>
     </div>
 
     <!-- IA -->
     <div id="ia" class="view"><span class="guide-ref">Guide Page 64-65</span><h1>IA: Research Proposal</h1><div class="header-anchor"></div>
-        <div class="card"><span class="strand-title">Crit A: Intro (6m)</span><label class="row-opt"><input type="radio" name="iaar" value="1" onchange="upd()"><span class="mark-tag">1-2</span><div class="txt-body">Aim broad. Studies not relevant.</div></label><label class="row-opt"><input type="radio" name="iaar" value="2" onchange="upd()"><span class="mark-tag">3-4</span><div class="txt-body">Aim partially focused.</div></label><label class="row-opt"><input type="radio" name="iaar" value="3" onchange="upd()"><span class="mark-tag">5-6</span><div class="txt-body">Aim focused. Studies fully relevant.</div></label></div>
+        <div class="card"><span class="strand-title">Crit A: Intro (6m)</span><label class="row-opt"><input type="radio" name="iaar" value="1" onchange="upd()"><span class="mark-tag">1-2</span><div class="txt-body">Aim broad. Studies not relevant.</div></label><label class="row-opt"><input type="radio" name="iaar" value="2" onchange="upd()"><span class="mark-tag">3-4</span><div class="txt-body">Aim partially focused. 2 studies linked.</div></label><label class="row-opt"><input type="radio" name="iaar" value="3" onchange="upd()"><span class="mark-tag">5-6</span><div class="txt-body">Aim focused. Studies fully relevant.</div></label></div>
         <div class="card"><span class="strand-title">Crit B: Method (6m)</span><label class="row-opt"><input type="radio" name="iabr" value="1" onchange="upd()"><span class="mark-tag">1-2</span><div class="txt-body">Method errors. Procedure unclear.</div></label><label class="row-opt"><input type="radio" name="iabr" value="2" onchange="upd()"><span class="mark-tag">3-4</span><div class="txt-body">Choice described. Ethics mentioned.</div></label><label class="row-opt"><input type="radio" name="iabr" value="3" onchange="upd()"><span class="mark-tag">5-6</span><div class="txt-body">Choice explained. Ethics linked.</div></label></div>
         <div class="card"><span class="strand-title">Crit C: Data (6m)</span><label class="row-opt"><input type="radio" name="iacr" value="1" onchange="upd()"><span class="mark-tag">1-2</span><div class="txt-body">Tool errors. Potential challenges generic.</div></label><label class="row-opt"><input type="radio" name="iacr" value="2" onchange="upd()"><span class="mark-tag">3-4</span><div class="txt-body">Tool appropriate. Decisions described.</div></label><label class="row-opt"><input type="radio" name="iacr" value="3" onchange="upd()"><span class="mark-tag">5-6</span><div class="txt-body">Effective tool. Decisions explained.</div></label></div>
         <div class="card"><span class="strand-title">Crit D: Discussion (6m)</span><label class="row-opt"><input type="radio" name="iadr" value="1" onchange="upd()"><span class="mark-tag">1-2</span><div class="txt-body">Implications not addressed. Bias identified.</div></label><label class="row-opt"><input type="radio" name="iadr" value="2" onchange="upd()"><span class="mark-tag">3-4</span><div class="txt-body">Implications partially addressed.</div></label><label class="row-opt"><input type="radio" name="iadr" value="3" onchange="upd()"><span class="mark-tag">5-6</span><div class="txt-body">Implications fully explained.</div></label></div>
@@ -325,12 +324,12 @@
     <!-- EXPORT MANAGER -->
     <div id="export" class="view">
         <h1>Export Manager</h1>
-        <p class="desc">Toggle sections to include in your output. Selection is based on whether marking or comments were provided.</p>
+        <p class="desc">Only sections with marking data are active. Select items to include in your output.</p>
         <div class="card" id="export-list"></div>
         <div style="display:flex; flex-direction:column; gap:10px;">
-            <button class="btn btn-blue" onclick="doExport('simple')">Download Simple Text Feedback</button>
-            <button class="btn btn-green" onclick="doExport('student')">Generate AI Prompt for Student (Drafting Aid)</button>
-            <button class="btn btn-purple" onclick="doExport('teacher')">Generate AI Formatted Teacher Feedback</button>
+            <button class="btn btn-blue" onclick="doExport('simple')">Download Simple Feedback (.txt)</button>
+            <button class="btn btn-green" onclick="doExport('student')">Generate AI Drafting Prompt (for Student)</button>
+            <button class="btn btn-purple" onclick="doExport('teacher')">Generate AI Formatted Report (for Teacher)</button>
         </div>
     </div>
 
@@ -338,12 +337,12 @@
     <div id="help" class="view">
         <h1>Help & Pedagogy</h1>
         <div class="card">
-            <h3>Best-Fit Model</h3>
-            <p>This suite uses <b>independent strand assessment</b>. Instead of selecting a holistic paragraph, you grade individual components (Knowledge, Analysis, etc.). The tool identifies the performance "center of gravity" across selected rows.</p>
-            <h3>Export Logic</h3>
-            <p><b>1. Simple Feedback:</b> A direct list of strand achievement and comments. Good for formal records.</p>
-            <p><b>2. Student AI Prompt:</b> Packages feedback into a "Tutor Prompt." Students use this with an LLM to understand the <b>Keyword Shift</b> (e.g., evolving a "described" study into an "explained" one).</p>
-            <p><b>3. Teacher AI Formatter:</b> Processes raw marking into a polished document. It corrects teacher typos/grammar but <b>never changes teacher meaning/tone</b>. It identifies the highest impact improvement areas (ROI) based on the lowest scoring strands.</p>
+            <h3>Best-Fit Assessment Strategy</h3>
+            <p>This tool utilizes a <strong>strand-based Best-Fit Model</strong>. By evaluating Knowledge, Analysis, and Terminology independently, the tool identifies the "center of gravity" across strands. This ensures students receive credit for isolated strengths even if evaluate or synthesis is still developing.</p>
+            <h3>Export Utility Guide</h3>
+            <p><strong>1. Simple Feedback:</strong> Best for your own gradebook or raw record. It lists every rubric selection and your comments clearly.</p>
+            <p><strong>2. Student AI Prompt:</strong> Packages the raw data into a pedagogical tutoring prompt. It asks the AI to act as a 2027-specific tutor, helping students understand exactly what "Keyword Shift" (e.g. from <i>'Described'</i> to <i>'Explained'</i>) they need to make to improve their draft.</p>
+            <p><strong>3. Teacher AI Formatter:</strong> A "Clean & Format" prompt. It instructs the AI to polish your shorthand, fix typos, and organize the feedback into a professional student-facing report. It includes a <b>Priority Improvement Plan</b> that targets the student's 3 lowest-scoring areas for maximum ROI.</p>
         </div>
     </div>
 
@@ -351,18 +350,18 @@
     <div class="dock-bar">
         <div class="fit-info">
             <h3 id="fit-title">Select descriptors...</h3>
-            <p id="fit-logic">Best-fit calculates majority achievement across strands.</p>
+            <p id="fit-logic">Best-fit calculates average achievement level across strands.</p>
         </div>
         <div class="res-box">
             <span class="res-val" id="score-out">0</span>
-            <span class="res-lbl">Estimated Mark</span>
+            <span class="res-lbl">Best Fit Mark</span>
         </div>
     </div>
 
 </div>
 
 <script>
-    const KEY = 'psych_marker_2027_v3';
+    const KEY = 'psych2027_master_storage';
 
     // Inject headers
     document.querySelectorAll('.view:not(#export):not(#help)').forEach(v => {
@@ -392,7 +391,7 @@
 
         if(manField && manField.value !== "") {
             display.innerText = manField.value;
-            title.innerText = "Manual Teacher Entry";
+            title.innerText = "Manual Override Active";
             save(); return;
         }
 
@@ -408,9 +407,9 @@
             let i = Math.round(avg);
             display.innerText = ranges[i]; title.innerText = names[i];
         } else if (['p1a','p2aq1','p2aq2','p3q1'].includes(vid)) {
-            display.innerText = Math.round(avg * 2); title.innerText = avg > 1.5 ? "Strong" : "Developing";
+            display.innerText = Math.round(avg * 2); title.innerText = avg > 1.5 ? "Detailed" : "Limited";
         } else {
-            display.innerText = Math.round(avg * 2); title.innerText = avg > 2.5 ? "High Level" : "Partial Level";
+            display.innerText = Math.round(avg * 2); title.innerText = avg > 2.5 ? "Strong" : "Partial";
         }
         save();
     }
@@ -440,7 +439,7 @@
     }
 
     function resetRubrics() {
-        if(confirm("Wipe student markings/comments? (Questions will stay)")) {
+        if(confirm("Reset all marking and comments for this batch? (Questions will stay)")) {
             document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
             document.querySelectorAll('textarea, .manual-grade-field').forEach(t => t.value = "");
             save(); upd();
@@ -448,7 +447,7 @@
     }
 
     function resetAll() {
-        if(confirm("Full Reset: Clear everything?")) { localStorage.removeItem(KEY); location.reload(); }
+        if(confirm("Full Reset: Clear all data including questions?")) { localStorage.removeItem(KEY); location.reload(); }
     }
 
     function renderExport() {
@@ -456,16 +455,19 @@
         list.innerHTML = "";
         document.querySelectorAll('.view').forEach(v => {
             if(['export','help'].includes(v.id)) return;
-            const hasData = v.querySelectorAll('input[type="radio"]:checked').length > 0 || v.querySelector('textarea').value.trim() !== "";
+            const hasMarking = v.querySelectorAll('input[type="radio"]:checked').length > 0;
+            const hasComment = v.querySelector('textarea').value.trim() !== "";
+            const isCompleted = hasMarking || hasComment;
+            
             const row = document.createElement('div');
-            row.className = `export-row ${!hasData ? 'disabled' : ''}`;
-            row.innerHTML = `<input type="checkbox" id="chk-${v.id}" ${hasData ? 'checked' : ''}> <label>${v.querySelector('h1').innerText}</label>`;
+            row.className = `export-row ${!isCompleted ? 'disabled' : ''}`;
+            row.innerHTML = `<input type="checkbox" id="chk-${v.id}" ${isCompleted ? 'checked' : ''}> <label>${v.querySelector('h1').innerText}</label>`;
             list.appendChild(row);
         });
     }
 
     function doExport(type) {
-        let text = "IB PSYCHOLOGY 2027 DATA\n====================\n\n";
+        let text = "IB PSYCHOLOGY 2027 ASSESSMENT FEEDBACK\n======================================\n\n";
         document.querySelectorAll('.view').forEach(v => {
             const chk = document.getElementById('chk-'+v.id);
             if(chk && chk.checked) {
@@ -474,33 +476,50 @@
                 text += `SECTION: ${v.querySelector('h1').innerText}\n`;
                 if(q) text += `QUESTION: ${q}\n`;
                 v.querySelectorAll('input[type="radio"]:checked').forEach(r => {
-                    text += `- ${r.closest('.card').querySelector('.strand-title').innerText}: [VAL:${r.value}] ${r.parentElement.innerText.trim()}\n`;
+                    text += `- ${r.closest('.card').querySelector('.strand-title').innerText}: [LEVEL_VAL:${r.value}] ${r.parentElement.innerText.trim()}\n`;
                 });
-                if(man) text += `FINAL MARK: ${man}\n`;
-                if(v.querySelector('textarea').value) text += `TEACHER COMMENT: ${v.querySelector('textarea').value}\n`;
+                if(man) text += `FINAL ASSIGNED MARK: ${man}\n`;
+                if(v.querySelector('textarea').value) text += `TEACHER FEEDBACK: ${v.querySelector('textarea').value}\n`;
                 text += "\n---\n";
             }
         });
 
         if(type === 'student') {
-            text = `ACT AS AN IB PSYCHOLOGY TUTOR (2027 GUIDE). Identify "Keyword Shifts" required based on the data provided.\n\n${text}`;
+            text = `ACT AS AN IB PSYCHOLOGY TUTOR SPECIALIZING IN THE FIRST ASSESSMENT 2027 GUIDE.
+I am an IB student. My teacher has provided me with granular, strand-based feedback on my psychology drafts.
+
+CONTEXT:
+This feedback is based on the 2027 Curriculum which emphasizes the relationship between Concepts, Content, and Context.
+
+FEEDBACK DATA PROVIDED:
+${text}
+
+CORE INSTRUCTIONS FOR YOUR RESPONSE:
+1. KEYWORD SHIFT ANALYSIS: Look at the [LEVEL_VAL] tags. For any strand below the maximum, identify the verbatim keyword used in my current level (e.g., 'limited', 'partially', 'some') and explicitly explain what the "Step Up" keyword looks like in actual writing (e.g., how to turn a 'limited' point into a 'detailed' explanation).
+2. COMMAND TERM ANCHORING: If a "QUESTION" field is provided, identify the Command Term and explain how my draft should meet that specific AO level (AO1, AO2, or AO3).
+3. THREE ACTIONABLE STRATEGIES: Provide exactly 3 high-impact strategies I can use in my next draft. Anchor these directly to the "TEACHER FEEDBACK" provided. 
+4. FALLBACK LOGIC: If a teacher's feedback is brief, use the Qualitative Descriptors in the selected strands to infer what is missing and provide general 2027-aligned guidance.`;
         } else if(type === 'teacher') {
-            text = `ACT AS A FORMAL FEEDBACK PROCESSOR (IB PSYCHOLOGY 2027 GUIDE). 
+            text = `ACT AS A FORMAL PEDAGOGICAL FEEDBACK PROCESSOR FOR IB PSYCHOLOGY (2027 GUIDE).
 
-INSTRUCTIONS:
-1. NEVER alter the meaning, tone, or specific professional judgement of teacher comments.
-2. DO correct spelling and grammatical errors within the teacher comments.
-3. Organize the feedback into a professional student-facing report.
-4. PRIORITY IMPROVEMENT PLAN: Based on areas where [VAL] is low, provide a "Top 3" list of actionable items. Anchor these to the teacher's specific comments. If multiple papers are present, limit total items to 3-5 based on lowest mark return.
+OBJECTIVE:
+Transform raw marking data and teacher shorthand into a polished, professional, student-facing assessment report.
 
-DATA:
+MANDATORY CONSTRAINTS:
+1. DO NOT change the teacher's professional judgement, tone, or core meaning.
+2. DO correct spelling, punctuation, and grammatical errors in the "TEACHER FEEDBACK" section.
+3. STRUCTURE: Present the feedback section by section. Clear headings are required.
+4. BEST-FIT EXPLANATION: If a mark range (e.g. 7-9) is assigned, briefly explain the "Balance of Achievement" logic—how strengths in one strand (like Terminology) weighed against development in another (like Analysis).
+5. PRIORITY IMPROVEMENT PLAN: At the end of the report, create a "Top 3 Priorities for Growth" list. You must choose the 3 sections with the lowest [LEVEL_VAL] achievement and anchor the advice to the specific teacher comments. If teacher comments are brief, flesh out the advice using the verbatim requirements of the next higher rubric band.
+
+DATA TO PROCESS:
 ${text}`;
         }
 
         const blob = new Blob([text], {type: "text/plain"});
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `IBPsych_${type}_Export.txt`;
+        a.download = `Psych_2027_${type}_Prompt.txt`;
         a.click();
     }
 
