@@ -1,30 +1,28 @@
 /**
  * IB Psychology 2027 Marking Tool - Engine
- * Handles UI Generation, Logic, Persistence, and Exports
+ * Handles UI Generation, Logic, Persistence, and High-Context Exports
  */
 
 let appState = {};
-const STORAGE_KEY = 'psych_2027_master_state';
+const STORAGE_KEY = 'psych_2027_master_vFinal';
+// Official order matching the Guide and Sidebar hierarchy
+const ORDER = ['p1a', 'p1b', 'p1c', 'p2aq1', 'p2aq2', 'p2aq3', 'p2aq4', 'p2b', 'p3q1', 'p3q2', 'p3q3', 'p3q4', 'ia'];
 
 // 1. INITIALIZATION
 window.onload = () => {
     initSidebar();
     loadState();
-    // Default to first section
-    nav('p1a');
+    nav('p1a'); // Start at Paper 1 Section A
 };
 
 // 2. UI GENERATION
 function initSidebar() {
     const container = document.getElementById('nav-container');
-    let currentCat = "";
-    
-    // Grouping for sidebar logic
     const groups = {
-        "Paper 1": ["p1a", "p1b", "p1c"],
-        "Paper 2": ["p2aq1", "p2aq2", "p2aq3", "p2aq4", "p2b"],
-        "Paper 3": ["p3q1", "p3q2", "p3q3", "p3q4"],
-        "Internal assessment": ["ia"]
+        "Paper 1: Core": ["p1a", "p1b", "p1c"],
+        "Paper 2: Options": ["p2aq1", "p2aq2", "p2aq3", "p2aq4", "p2b"],
+        "Paper 3: HL Ext": ["p3q1", "p3q2", "p3q3", "p3q4"],
+        "Internal Assessment": ["ia"]
     };
 
     let html = "";
@@ -49,9 +47,10 @@ function renderRubric(id) {
             <h1>${rubric.title}</h1>
             
             <div class="context-box">
-                <label>Question / Prompt Text</label>
+                <label>Question / Prompt being marked</label>
                 <input type="text" class="q-input" id="q-${id}" 
-                    placeholder="Enter specific question text here to anchor AI feedback..." 
+                    value="${appState['q-'+id] || ''}"
+                    placeholder="Paste specific question/prompt text here to anchor AI drafting..." 
                     oninput="saveInput('q-${id}', this.value)">
             </div>`;
 
@@ -92,7 +91,6 @@ function renderRubric(id) {
 
 // 3. NAVIGATION
 function nav(id) {
-    // Handling special tool views
     if (id === 'export') {
         renderExportManager();
     } else if (id === 'help') {
@@ -101,30 +99,30 @@ function nav(id) {
         renderRubric(id);
     }
     
-    // UI Classes
     document.querySelectorAll('#sidebar a').forEach(a => a.classList.remove('active'));
     const btn = document.getElementById('btn-' + id);
     if (btn) btn.classList.add('active');
     window.scrollTo(0, 0);
 }
 
-// 4. LOGIC ENGINE
+// 4. LOGIC ENGINE (VERBATIM BEST-FIT & SUMMATIVE)
 function calculateScore(id) {
     const rubric = PSYCH_RUBRICS[id];
     const display = document.getElementById('score-out');
     const title = document.getElementById('fit-title');
     const logic = document.getElementById('fit-logic');
 
-    // Check Manual Override
+    // Priority 1: Manual Override
     const manVal = appState[`man-${id}`];
     if (manVal && manVal !== "") {
         display.innerText = manVal;
         title.innerText = "Manual Teacher Override";
-        logic.innerText = "The calculated best-fit has been bypassed by your manual entry.";
+        logic.innerText = "Mathematical Best-Fit has been bypassed by manual teacher entry.";
+        save();
         return;
     }
 
-    // Collect checked radio values for this ID
+    // Collect levels
     let pts = 0;
     let count = 0;
     rubric.strands.forEach((_, sIdx) => {
@@ -138,48 +136,57 @@ function calculateScore(id) {
     if (count === 0) {
         display.innerText = "0";
         title.innerText = "Select descriptors...";
+        logic.innerText = "Awaiting strand selections for best-fit analysis.";
         return;
     }
 
+    let avg = pts / count;
+
+    // IA Logic: Summative (Criteria A+B+C+D)
     if (rubric.type === "summative") {
         display.innerText = pts;
-        title.innerText = `Summative Total: ${pts} / ${rubric.maxMark}`;
-        logic.innerText = "IA marks are summed across criteria A, B, C, and D.";
-    } else {
-        const avg = pts / count;
-        if (rubric.type === "best-fit-15") {
-            const ranges = ["0", "1-3", "4-6", "7-9", "10-12", "13-15"];
-            const names = ["N/A", "Rudimentary", "Basic", "Satisfactory", "Good", "Excellent"];
-            const idx = Math.round(avg);
-            display.innerText = ranges[idx];
-            title.innerText = names[idx] + " performance level";
-            logic.innerText = "Centering markband based on balance of achievement across strands.";
-        } else {
-            // Standard SAQ logic (4m or 6m)
-            const result = Math.round(avg * (rubric.maxMark / (pts/avg))); // Simplified scaling
-            display.innerText = Math.round(avg * (rubric.maxMark / (rubric.strands[0].options.length))); 
-            // Better simpler scaling for SAQs:
-            const scaled = Math.round(avg * (rubric.maxMark / (rubric.strands[0].options.length)));
-            display.innerText = scaled;
-            title.innerText = avg > 1.5 ? "Strong Achievement" : "Developing Achievement";
-        }
+        title.innerText = `Cumulative IA Mark: ${pts} / 24`;
+        logic.innerText = `Mathematical Logic: A+B+C+D summative achievement (Current: ${pts}/24).`;
+    } 
+    // Exam Logic: Best-Fit Averaging
+    else if (rubric.type === "best-fit-15") {
+        const ranges = ["0", "1-3", "4-6", "7-9", "10-12", "13-15"];
+        const names = ["N/A", "Rudimentary", "Basic", "Satisfactory", "Good", "Excellent"];
+        let bandIdx = Math.round(avg);
+        
+        // Refined Point Estimate within band based on decimal
+        let pointEstimate = (bandIdx * 3) - (3 - Math.round((avg % 1 || (avg == bandIdx ? 1 : 0)) * 3));
+        if (bandIdx == 0) pointEstimate = 0;
+
+        display.innerText = `${ranges[bandIdx]} (${pointEstimate})`;
+        title.innerText = `${names[bandIdx]} performance level`;
+        logic.innerText = `Best-Fit: Average level across ${count} strands is ${avg.toFixed(2)}. Calculated center is mark ${pointEstimate}.`;
+    } 
+    else {
+        // Scaling Logic for SAQs (4m and 6m)
+        let finalMark = Math.round(avg * (rubric.maxMark / rubric.strands[0].options.length));
+        display.innerText = finalMark;
+        title.innerText = avg > 1.5 ? "Strong Performance" : "Developing Performance";
+        logic.innerText = `Scaling: Average level ${avg.toFixed(2)} mapped to section max of ${rubric.maxMark}.`;
     }
+    save();
 }
 
 // 5. PERSISTENCE
 function saveRadio(name, val) {
     appState[name] = val;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
-    const id = name.split('-')[1];
-    calculateScore(id);
+    save();
+    calculateScore(name.split('-')[1]);
 }
 
 function saveInput(id, val) {
     appState[id] = val;
+    save();
+    if (id.startsWith('man-')) calculateScore(id.split('-')[1]);
+}
+
+function save() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
-    if (id.startsWith('man-')) {
-        calculateScore(id.split('-')[1]);
-    }
 }
 
 function loadState() {
@@ -188,17 +195,17 @@ function loadState() {
 }
 
 function resetRubrics() {
-    if (confirm("Clear all marking and comments? (Question fields will be kept for batch marking)")) {
+    if (confirm("Reset current student marks and comments? (Question fields will be kept for batch marking)")) {
         for (let key in appState) {
             if (!key.startsWith('q-')) delete appState[key];
         }
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+        save();
         location.reload();
     }
 }
 
 function resetAll() {
-    if (confirm("Full reset: clear all data including question prompts?")) {
+    if (confirm("Full wipe: Clear all data including questions?")) {
         localStorage.removeItem(STORAGE_KEY);
         location.reload();
     }
@@ -207,91 +214,90 @@ function resetAll() {
 // 6. EXPORT MANAGER
 function renderExportManager() {
     const container = document.getElementById('active-view-container');
-    let html = `<h1>Export Manager</h1><p class="page-desc">Select components to include. Sections with marking data are auto-selected.</p><div class="card">`;
+    let html = `<h1>Export Manager</h1><p class="page-desc">Check components to include. Data-less sections are excluded from checkboxes by default.</p><div class="card">`;
     
-    Object.keys(PSYCH_RUBRICS).forEach(id => {
+    ORDER.forEach(id => {
         const rubric = PSYCH_RUBRICS[id];
-        // Check if section is marked
         let hasMarking = false;
         rubric.strands.forEach((_, sIdx) => { if(appState[`rad-${id}-s${sIdx}`]) hasMarking = true; });
         if(appState[`comm-${id}`] && appState[`comm-${id}`].trim() !== "") hasMarking = true;
-        if(appState[`man-${id}`]) hasMarking = true;
+        if(appState[`man-${id}`] && appState[`man-${id}`] !== "") hasMarking = true;
 
         html += `
             <div class="export-row ${!hasMarking ? 'disabled' : ''}">
                 <input type="checkbox" id="chk-${id}" ${hasMarking ? 'checked' : ''}>
-                <label>${rubric.title}</label>
+                <label style="font-weight:bold">${rubric.title}</label>
             </div>`;
     });
 
     html += `</div><div style="display:flex; flex-direction:column; gap:10px;">
         <button class="btn btn-blue" onclick="doExport('simple')">Download Simple Feedback (.txt)</button>
         <button class="btn btn-green" onclick="doExport('student')">Generate AI Student Tutor Prompt</button>
-        <button class="btn btn-purple" onclick="doExport('teacher')">Generate AI Teacher Report Prompt</button>
+        <button class="btn btn-purple" onclick="doExport('teacher')">Generate AI Teacher Formatter Prompt</button>
     </div>`;
     container.innerHTML = html;
 }
 
 function doExport(mode) {
-    let dataText = "IB PSYCHOLOGY 2027 ASSESSMENT REPORT\n======================================\n\n";
+    let output = "IB PSYCHOLOGY 2027 ASSESSMENT: RAW FEEDBACK LOG\n===============================================\n\n";
     
-    Object.keys(PSYCH_RUBRICS).forEach(id => {
+    ORDER.forEach(id => {
         const chk = document.getElementById(`chk-${id}`);
         if (chk && chk.checked) {
             const rubric = PSYCH_RUBRICS[id];
-            dataText += `SECTION: ${rubric.title}\n`;
+            output += `### SECTION: ${rubric.title} (${rubric.ref})\n`;
             
-            const qVal = appState[`q-${id}`];
-            if(qVal) dataText += `QUESTION CONTEXT: ${qVal}\n`;
+            if(appState[`q-${id}`]) output += `PROMPT CONTEXT: ${appState[`q-${id}`]}\n`;
 
             rubric.strands.forEach((strand, sIdx) => {
                 const val = appState[`rad-${id}-s${sIdx}`];
                 if(val) {
                     const opt = strand.options.find(o => o.val == val);
-                    dataText += `- ${strand.name}: [LEVEL ${val}] ${opt.text.replace(/<[^>]*>?/gm, '')}\n`;
+                    output += `- ${strand.name}: [VAL:${val}] ${opt.text.replace(/<[^>]*>?/gm, '')}\n`;
                 }
             });
 
-            const manVal = appState[`man-${id}`];
-            if(manVal) dataText += `TEACHER ASSIGNED MARK: ${manVal}\n`;
+            if(appState[`man-${id}`]) output += `TEACHER ASSIGNED MARK: ${appState[`man-${id}`]}\n`;
+            if(appState[`comm-${id}`]) output += `TEACHER COMMENT: ${appState[`comm-${id}`]}\n`;
 
-            const commVal = appState[`comm-${id}`];
-            if(commVal) dataText += `TEACHER SPECIFIC COMMENTS: ${commVal}\n`;
-
-            dataText += "\n---\n";
+            output += "\n-----------------------------------------------\n";
         }
     });
 
-    let finalBody = dataText;
-
     if (mode === 'student') {
-        finalBody = `ACT AS AN IB PSYCHOLOGY TUTOR (FIRST ASSESSMENT 2027 GUIDE). 
-I am a student. Below is granular feedback from my teacher.
+        output = `ACT AS AN IB PSYCHOLOGY TUTOR (SPECIALIZING IN THE 2027 FIRST ASSESSMENT GUIDE).
+I am an IB student. Below is granular feedback from my teacher using the new curriculum strands.
+
+CONTEXT:
+The 2027 curriculum is concepts-driven, focusing on Content, Concepts, and Context. 
+The achievement level tags [VAL:X] indicate my current position on a 1-5 level (for ERQs) or 1-3 level (for SAQs/IA).
+
+FEEDBACK DATA PROVIDED:
+${output}
+
+TASK:
+1. Identify the keywords in my current achievement levels (e.g., 'limited', 'partially', 'some').
+2. Explain the "Keyword Shift" needed to move to the next markband (e.g., how to move from 'describing' to 'explaining' or 'fully explained' based strictly on 2027 standards).
+3. Provide exactly 3 high-impact drafting strategies for my next iteration, anchored to the "PROMPT CONTEXT" and "TEACHER COMMENT" provided.
+4. If teacher comments are brief, use the Qualitative Rubric descriptors to infer exactly what is missing from a standard top-tier response.`;
+    } 
+    else if (mode === 'teacher') {
+        output = `ACT AS A PROFESSIONAL PEDAGOGICAL FEEDBACK FORMATTER (IB PSYCHOLOGY 2027 GUIDE). 
+
+OBJECTIVE: Polish raw teacher shorthand and rubric data into a professional, encouraging, and formal student-facing report.
+
+MANDATORY INSTRUCTIONS:
+1. Fix all spelling, grammar, and punctuation errors in the "TEACHER COMMENT" sections.
+2. NEVER change the teacher's tone, professional judgement, or core meaning.
+3. Group the feedback clearly by Exam Paper / IA section.
+4. PRIORITY GROWTH PLAN: Based on the strands with the lowest [VAL] tags, identify the "Top 3 Priorities" for the student. Anchor these items to the provided teacher comments.
+5. If teacher comments are very brief, expand the feedback by using the qualitative language of the next higher rubric band to explain the necessary path to improvement.
 
 FEEDBACK DATA:
-${dataText}
-
-INSTRUCTIONS:
-1. Identify the keywords in my current achievement levels (e.g., 'limited', 'partially', 'some').
-2. Explain the "Keyword Shift" needed to move to the next level (e.g., how to move from 'describing' to 'explaining' based on 2027 standards).
-3. Provide 3 specific strategies for my next draft, anchored to the "QUESTION CONTEXT" provided.
-4. If teacher comments are brief, use the rubric descriptors to infer what is missing.`;
-    } else if (mode === 'teacher') {
-        finalBody = `ACT AS A PROFESSIONAL PEDAGOGICAL FEEDBACK PROCESSOR (IB PSYCHOLOGY 2027 GUIDE). 
-
-OBJECTIVE: Polishing teacher shorthand into a formal student report.
-
-INSTRUCTIONS:
-1. Fix all spelling/grammar in "TEACHER SPECIFIC COMMENTS" but DO NOT alter the tone, professional judgement, or core meaning.
-2. Group the data into a professional report.
-3. PRIORITY PLAN: Identify the Top 3 areas for growth based on the lowest scoring [LEVEL] strands. 
-4. If teacher comments are brief, use the verbatim qualitative language of the next higher rubric band to explain what is needed for improvement.
-
-DATA:
-${dataText}`;
+${output}`;
     }
 
-    const blob = new Blob([finalBody], {type: "text/plain"});
+    const blob = new Blob([output], {type: "text/plain"});
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = `IBPsych2027_${mode}_Export.txt`;
@@ -299,18 +305,16 @@ ${dataText}`;
 }
 
 function renderHelp() {
-    const container = document.getElementById('active-view-container');
-    container.innerHTML = `
+    document.getElementById('active-view-container').innerHTML = `
         <h1>Help & Pedagogy</h1>
         <div class="card">
-            <h3>The Best-Fit Model</h3>
-            <p>This tool uses <b>Independent Strand Assessment</b>. Instead of selecting a holistic paragraph, you grade individual strands (Knowledge, Analysis, etc.). The tool identifies the "center of gravity" of a student's performance, ensuring they are rewarded for specific strengths even if other areas are developing.</p>
-            <h3>Export Options</h3>
+            <h3>Standardized Assessment Logic</h3>
+            <p><strong>Exams (Best-Fit Averaging):</strong> Following Guide pages 46-47, this tool evaluates the "balance of achievement." It identifies the average strand level and centers the markband range accordingly.</p>
+            <p><strong>Internal Assessment (Summative):</strong> IA marks for the Research Proposal (Criteria A-D) are calculated summatively to provide a final score out of 24.</p>
+            <h3>Pedagogical Value</h3>
             <ul>
-                <li><b>Simple Feedback:</b> A verbatim log of achievement for internal records or formal reporting.</li>
-                <li><b>Student AI Prompt:</b> Packages feedback into a "Tutor Prompt." Students use this with an AI to understand the <b>Keyword Shift</b> (e.g. turning an AO1 'description' into an AO3 'explanation').</li>
-                <li><b>Teacher AI Prompt:</b> Instructs AI to polish your raw notes into a professional report, fixing typos while preserving your "voice" and identifying high-ROI growth targets.</li>
+                <li><b>The Keyword Shift:</b> Bolding keywords in the rubric helps students see the linguistic "step up" required to move from Level 2 to Level 3.</li>
+                <li><b>LLM Prompting:</b> The AI exports package teacher shorthand with high-context instructions to ensure the student receives 2027-compliant tutoring.</li>
             </ul>
-        </div>
-    `;
+        </div>`;
 }
