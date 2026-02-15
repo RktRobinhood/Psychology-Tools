@@ -1,6 +1,6 @@
 /**
  * IB Psychology 2027 Marking Tool - Stylesheet
- * Handles Layout, Verbatim Highlighting, and Logic Tooltips
+ * Handles Layout, Verbatim Highlighting, and Robust Logic Tooltips
  */
 
 :root {
@@ -95,7 +95,7 @@ body {
     margin-left: var(--nav-width);
     padding: 40px;
     width: calc(100% - var(--nav-width));
-    max-width: 1000px;
+    max-width: 950px;
     padding-bottom: 200px;
     box-sizing: border-box;
 }
@@ -296,7 +296,7 @@ textarea {
 .btn-red { background: var(--accent-red); color: white; }
 .btn-red:hover { background: #dc2626; }
 
-/* 7. BOTTOM DOCK & TOOLTIP */
+/* 7. BOTTOM DOCK & ROBUST TOOLTIP */
 .dock-bar {
     position: fixed;
     bottom: 0;
@@ -334,7 +334,7 @@ textarea {
     cursor: help;
 }
 
-/* Logic Tooltip using the data-tooltip attribute */
+/* Robust Tooltip Implementation */
 .res-box:hover::after {
     content: attr(data-tooltip);
     position: absolute;
@@ -369,15 +369,4 @@ textarea {
     text-transform: uppercase;
     display: block;
     margin-top: 5px;
-}
-
-/* Help View Styling */
-.view ul {
-    padding-left: 20px;
-    margin-top: 10px;
-}
-
-.view li {
-    margin-bottom: 10px;
-    font-size: 0.95rem;
 }

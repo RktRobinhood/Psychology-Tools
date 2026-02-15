@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IB Psychology 2027 Master Marking Suite</title>
-    <!-- Linking modular CSS -->
+    <!-- Link to modular CSS -->
     <link rel="stylesheet" href="styles.css">
     <!-- Google Fonts for professional Inter typeface -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +19,7 @@
             <h2>Psych Marker 2027</h2>
         </header>
         
-        <!-- Sidebar links are injected here by app.js -->
+        <!-- Sidebar links are injected here by app.js based on rubrics.js keys -->
         <div id="nav-container"></div>
 
         <div class="nav-cat">Tools</div>
@@ -38,23 +38,23 @@
     <!-- Main Content Rendering Area -->
     <main class="container">
         <div id="active-view-container">
-            <!-- Rubrics, Question Fields, and Manual Overrides are injected here -->
+            <!-- Rubrics, Question Fields, and Manual Overrides are injected here by app.js -->
             <div style="text-align: center; margin-top: 100px; color: #94a3b8;">
                 <h3>Initializing Best-Fit Assessment Engine...</h3>
             </div>
         </div>
     </main>
 
-    <!-- Floating Score Bar with Logic Tooltip -->
+    <!-- Floating Score Bar with Robust Logic Tooltip -->
     <div class="dock-bar">
         <div class="fit-info">
             <h3 id="fit-title">Select descriptors...</h3>
-            <!-- This text is mirrored into the tooltip below -->
-            <p id="fit-logic">Best-fit for exams; Summative for IA.</p>
+            <!-- This text is used by the observer below to populate the tooltip -->
+            <p id="fit-logic" style="display:none;">Awaiting selection...</p>
         </div>
-        <div class="res-box" id="logic-box" data-tooltip="Hover here after selecting strands to see mathematical logic.">
+        <div class="res-box" id="logic-box" data-tooltip="Hover here after selecting strands to see mathematical reasoning.">
             <span class="res-val" id="score-out">0</span>
-            <span class="res-lbl">Total Mark / Best-Fit</span>
+            <span class="res-lbl">Predicted Mark</span>
         </div>
     </div>
 
@@ -62,13 +62,19 @@
     <script src="rubrics.js"></script>
     <script src="app.js"></script>
 
-    <!-- Dynamic Tooltip Sync Script -->
+    <!-- Dynamic Tooltip Bridge -->
     <script>
-        // Observes changes in the logic text and updates the hover tooltip instantly
+        /**
+         * Observes the hidden #fit-logic paragraph.
+         * Whenever the app.js engine updates the reasoning text, 
+         * this script pushes that text into the data-tooltip attribute 
+         * for the CSS hover effect to display.
+         */
         const observer = new MutationObserver(() => {
             const tipText = document.getElementById('fit-logic').innerText;
             document.getElementById('logic-box').setAttribute('data-tooltip', tipText);
         });
+        
         observer.observe(document.getElementById('fit-logic'), { 
             childList: true, 
             characterData: true, 
