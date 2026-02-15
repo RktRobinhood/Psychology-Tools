@@ -1,17 +1,17 @@
 /**
  * IB Psychology 2027 Marking Tool - Logic Engine
- * Robust Midpoint Averaging, Logic Tooltips, and High-Context AI Prompts
+ * High-Context Edition: Best-Fit Logic, Manual Overrides, and AI System Prompts
  */
 
 let appState = {};
-const STORAGE_KEY = 'psych_2027_vFinal_Robust_Modular';
+const STORAGE_KEY = 'psych_2027_master_vFinal_Robust_Modular';
 const EXAM_ORDER = ['p1a', 'p1b', 'p1c', 'p2aq1', 'p2aq2', 'p2aq3', 'p2aq4', 'p2b', 'p3q1', 'p3q2', 'p3q3', 'p3q4', 'ia'];
 
 // 1. INITIALIZATION
 window.onload = () => {
     initSidebar();
     loadState();
-    nav('p1a'); // Start at first section
+    nav('p1a'); 
 };
 
 // 2. UI GENERATION
@@ -46,7 +46,7 @@ function renderRubric(id) {
             <h1>${rubric.title}</h1>
             
             <div class="context-box">
-                <label>Question / Prompt Text</label>
+                <label>Question / Prompt being marked</label>
                 <input type="text" class="q-input" id="q-${id}" 
                     value="${appState['q-'+id] || ''}"
                     placeholder="Enter specific question text here to anchor AI context..." 
@@ -100,14 +100,13 @@ function nav(id) {
     window.scrollTo(0, 0);
 }
 
-// 4. LOGIC ENGINE (ROBUST MIDPOINT CALCULATION)
+// 4. LOGIC ENGINE
 function upd(id) {
     const r = PSYCH_RUBRICS[id];
     const out = document.getElementById('score-out');
     const tit = document.getElementById('fit-title');
     const logicDisplay = document.getElementById('fit-logic');
 
-    // Case A: Manual Override
     if(appState[`man-${id}`] && appState[`man-${id}`] !== "") { 
         out.innerText = appState[`man-${id}`]; 
         tit.innerText = "Manual Override"; 
@@ -115,7 +114,6 @@ function upd(id) {
         save(); return; 
     }
 
-    // Case B: Calculate from Strands
     let sumMids = 0, count = 0;
     r.strands.forEach((strand, i) => { 
         const selectedVal = appState[`rad-${id}-s${i}`];
@@ -127,21 +125,18 @@ function upd(id) {
     });
 
     if (count === 0) { out.innerText = "0"; tit.innerText = "Select descriptors..."; return; }
-
     const meanMark = sumMids / count;
 
     if (r.type === "summative") {
-        // IA Logic: Summing midpoints directly (marks 1-6 per criteria)
         const finalSum = Math.round(sumMids);
         out.innerText = finalSum;
         tit.innerText = `Summative Total`;
-        logicDisplay.innerText = `IA SUMMATIVE LOGIC: Each criterion is marked independently. Total mark is the sum of Criteria A-D midpoints: ${sumMids.toFixed(1)} rounded to ${finalSum}/24.`;
+        logicDisplay.innerText = `IA SUMMATIVE LOGIC: Criteria A-D marked independently. Total mark is sum of midpoints: ${sumMids.toFixed(1)} rounded to ${finalSum}/24.`;
     } else {
-        // Exam Logic: Averaging Midpoints of Markbands
         const finalMark = Math.round(meanMark);
         out.innerText = finalMark;
         tit.innerText = getBandName(id, finalMark);
-        logicDisplay.innerText = `BEST-FIT LOGIC: The center of gravity for marked strands is ${meanMark.toFixed(2)} (the mean of selected band midpoints). This rounds to a final mark of ${finalMark}/${r.maxMark}.`;
+        logicDisplay.innerText = `BEST-FIT LOGIC: The center of performance is ${meanMark.toFixed(2)} (mean of selected band midpoints). Rounding to ${finalMark}/${r.maxMark}.`;
     }
     save();
 }
@@ -163,28 +158,19 @@ function saveRadio(n, v) { appState[n] = v; save(); upd(n.split('-')[1]); }
 function saveInput(id, v) { appState[id] = v; save(); if(id.startsWith('man-')) upd(id.split('-')[1]); }
 function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(appState)); }
 function loadState() { const s = localStorage.getItem(STORAGE_KEY); if(s) appState = JSON.parse(s); }
-function resetRubrics() { if(confirm("Keep questions, but clear all current markings and comments?")) { for(let k in appState) if(!k.startsWith('q-')) delete appState[k]; save(); location.reload(); }}
-function resetAll() { if(confirm("Full wipe of all fields?")) { localStorage.removeItem(STORAGE_KEY); location.reload(); }}
+function resetRubrics() { if(confirm("Keep questions, clear marks/comments?")) { for(let k in appState) if(!k.startsWith('q-')) delete appState[k]; save(); location.reload(); }}
+function resetAll() { if(confirm("Full wipe?")) { localStorage.removeItem(STORAGE_KEY); location.reload(); }}
 
 // 6. EXPORT MANAGER
 function renderExportManager() {
     const container = document.getElementById('active-view-container');
-    let html = `<h1>Export Manager</h1><p class="page-desc">Check components to include. Hierarchy matches Sidebar precisely.</p><div class="card">`;
-    
+    let html = `<h1>Export Manager</h1><p class="page-desc">Data-less sections are excluded from selection by default.</p><div class="card">`;
     EXAM_ORDER.forEach(id => {
         const rubric = PSYCH_RUBRICS[id];
-        let hasMarking = false;
-        rubric.strands.forEach((_, sIdx) => { if(appState[`rad-${id}-s${sIdx}`]) hasMarking = true; });
-        if(appState[`comm-${id}`] && appState[`comm-${id}`].trim() !== "") hasMarking = true;
-        if(appState[`man-${id}`]) hasMarking = true;
-
-        html += `
-            <div class="export-row ${!hasMarking ? 'disabled' : ''}">
-                <input type="checkbox" id="chk-${id}" ${hasMarking ? 'checked' : ''}>
-                <label style="font-weight:bold">${rubric.title}</label>
-            </div>`;
+        let hasData = appState[`man-${id}`] || (appState[`comm-${id}`] && appState[`comm-${id}`].trim() !== "");
+        rubric.strands.forEach((_, i) => { if(appState[`rad-${id}-s${i}`]) hasData = true; });
+        html += `<div class="export-row ${!hasData ? 'disabled' : ''}"><input type="checkbox" id="chk-${id}" ${hasData ? 'checked' : ''}><label style="font-weight:bold">${rubric.title}</label></div>`;
     });
-
     html += `</div><div style="display:flex; flex-direction:column; gap:10px;">
         <button class="btn btn-blue" onclick="doExport('simple')">Download Simple Feedback (.txt)</button>
         <button class="btn btn-green" onclick="doExport('student')">Generate AI Student Tutor Prompt</button>
@@ -194,16 +180,7 @@ function renderExportManager() {
 }
 
 function doExport(mode) {
-    let contextHeader = `SYSTEM CONTEXT: FIRST ASSESSMENT 2027 IB PSYCHOLOGY GUIDE
-======================================================
-This data adheres strictly to the 2027 curriculum.
-- Concepts, Content, and Context are the driving pillars.
-- AO1: Knowledge & Understanding
-- AO2: Application of Knowledge
-- AO3: Synthesis & Critical Analysis
-- Best-Fit Marking: Evaluated via strand midpoints.
-======================================================\n\n`;
-
+    let contextHeader = `SYSTEM CONTEXT: FIRST ASSESSMENT 2027 IB PSYCHOLOGY GUIDE\n======================================================\nAdhere strictly to 2027 standards (AO1/AO2/AO3 focus).\n======================================================\n\n`;
     let dataBody = "";
     EXAM_ORDER.forEach(id => {
         const chk = document.getElementById(`chk-${id}`);
@@ -211,48 +188,74 @@ This data adheres strictly to the 2027 curriculum.
             const r = PSYCH_RUBRICS[id];
             dataBody += `### COMPONENT: ${r.title}\n`;
             if(appState[`q-${id}`]) dataBody += `[QUESTION/PROMPT]: ${appState[`q-${id}`]}\n`;
-
             r.strands.forEach((strand, i) => {
                 const val = appState[`rad-${id}-s${i}`];
                 if(val) {
                     const opt = strand.options.find(o => o.val == val);
-                    dataBody += `- ${strand.name}: ACHIEVEMENT BAND ${opt.label} [Numerical Level ${val}]\n  Verbatim Guide Text: ${opt.text.replace(/<[^>]*>?/gm, '')}\n`;
+                    dataBody += `- ${strand.name}: ACHIEVEMENT BAND ${opt.label} [Numerical Level ${val}]\n  Descriptor: ${opt.text.replace(/<[^>]*>?/gm, '')}\n`;
                 }
             });
-
-            // Find current mark to export
             let pts = 0, count = 0;
-            r.strands.forEach((_, i) => { if(appState[`rad-${id}-s${i}`]) { 
-                const opt = r.strands[i].options.find(o => o.val == appState[`rad-${id}-s${i}`]);
-                pts += opt.mid; count++; 
-            }});
+            r.strands.forEach((_, i) => { if(appState[`rad-${id}-s${i}`]) { const opt = r.strands[i].options.find(o => o.val == appState[`rad-${id}-s${i}`]); pts += opt.mid; count++; }});
             const mark = appState[`man-${id}`] || Math.round(pts/count);
-
             dataBody += `[NUMERICAL MARK ASSIGNED]: ${mark}/${r.maxMark}\n`;
             if(appState[`comm-${id}`]) dataBody += `[TEACHER COMMENTS]: ${appState[`comm-${id}`]}\n`;
             dataBody += "\n---\n";
         }
     });
 
-    let finalPrompt = "";
-    if (mode === 'simple') { finalPrompt = dataBody; }
-    else if (mode === 'student') {
-        finalPrompt = `${contextHeader}ACT AS AN IB PSYCHOLOGY TUTOR (2027 GUIDE). Identify the "Keyword Shift" (e.g. how to turn a 'described' study into an 'explained' link to the prompt) required to improve my draft based on this feedback:\n\n${dataBody}`;
-    } else {
-        finalPrompt = `${contextHeader}ACT AS A FORMAL PEDAGOGICAL FEEDBACK PROCESSOR (IB PSYCHOLOGY 2027 GUIDE). 
-1. Fix grammar/typos in Teacher Comments without altering judgement or tone.
-2. Group feedback professionally.
-3. Identify TOP 3 priority improvements for the student based on the lowest mark sections.
-4. If comments are brief, expand them using the verbatim qualitative descriptors provided.\n\nDATA:\n${dataBody}`;
-    }
+    let finalPrompt = (mode==='simple') ? dataBody : (mode==='student') ? 
+        `${contextHeader}ACT AS AN IB PSYCHOLOGY TUTOR (2027 GUIDE). Student Feedback follows. Explain the "Keyword Shift" and provide 3 strategies.\n\n${dataBody}` :
+        `${contextHeader}ACT AS A FORMAL PEDAGOGICAL FEEDBACK PROCESSOR. Fix shorthand/typos, group professionally, and identity TOP 3 growth priorities.\n\n${dataBody}`;
 
     const blob = new Blob([finalPrompt], {type: "text/plain"});
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `IBPsych2027_${mode}.txt`;
+    link.download = `IBPsych2027_${mode}_Export.txt`;
     link.click();
 }
 
+// 7. RESTORED & EXPANDED HELP SECTION
 function renderHelp() {
-    document.getElementById('active-view-container').innerHTML = `<h1>Help & Pedagogy</h1><div class="card"><h3>Approach</h3><p>This tool uses <b>independent strand assessment</b>. IA sums midpoints (out of 24); Exams average midpoints for a robust Best-Fit estimate.</p></div>`;
+    document.getElementById('active-view-container').innerHTML = `
+        <h1>Help & Pedagogy</h1>
+        
+        <div class="card">
+            <span class="strand-title">1. The 2027 Best-Fit Philosophy</span>
+            <p>Following the <b>IB Psychology Guide (First Assessment 2027)</b> pages 46-47, assessment is <i>criterion-related</i> and uses a "best-fit" model. This tool moves away from holistic picking by allowing you to mark individual <b>Strands</b> (e.g., Knowledge, Analysis, Terminology).</p>
+            <p>The engine calculates the <b>Mean Midpoint</b> of your selections. This ensures that if a student is "Excellent" in Knowledge but "Basic" in Analysis, the tool identifies the mathematical "center of gravity" of their performance, landing them in the most statistically accurate markband.</p>
+        </div>
+
+        <div class="card">
+            <span class="strand-title">2. Linguistic "Step-Up" Logic</span>
+            <p>A core feature of this tool is the <b>Keyword Highlighting</b>. In the 2027 curriculum, the jump between markbands is defined by specific command terms and qualifiers:</p>
+            <ul>
+                <li><b>Level 2 (4-6):</b> Knowledge is <span class="kw">described</span>.</li>
+                <li><b>Level 3 (7-9):</b> Knowledge is <span class="kw">partly explained</span>.</li>
+                <li><b>Level 5 (13-15):</b> Knowledge is <span class="kw">fully explained</span>.</li>
+            </ul>
+            <p>By bolding these terms, teachers can show students exactly which linguistic "shift" is required to move to the next level.</p>
+        </div>
+
+        <div class="card">
+            <span class="strand-title">3. Export Utility Guide</span>
+            <p>The Export Manager provides three distinct workflows:</p>
+            <ul>
+                <li><b>Simple Feedback:</b> Generates a verbatim log of achievement. Ideal for internal tracking or copy-pasting into school reporting systems.</li>
+                <li><b>Student AI Prompt:</b> Designed for students to use with an LLM (like ChatGPT). It instructs the AI to act as a 2027-specific tutor, explaining how to bridge the gap between their current keywords and the next level.</li>
+                <li><b>Teacher AI Prompt:</b> Designed for teachers. It polishes raw shorthand and fixes typos without altering professional judgement. It automatically identifies the <b>3 High-ROI Priorities</b> based on the student's lowest scoring strands.</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <span class="strand-title">4. Batch Marking Workflow</span>
+            <p>To mark a full class efficiently:</p>
+            <ol>
+                <li>Enter the <b>Question Text</b> for the prompt (this anchors the AI logic).</li>
+                <li>Mark the student using the radio buttons and add specific comments.</li>
+                <li>Export the data.</li>
+                <li>Click <b>"Reset Student Marking"</b>. This wipes the rubrics and comments but <b>keeps the question text</b> fixed, so you don't have to re-enter it for the next student.</li>
+            </ol>
+        </div>
+    `;
 }
