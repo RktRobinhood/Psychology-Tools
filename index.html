@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IB Psychology 2027 Marking Tool</title>
+    <title>IB Psychology 2027 Master Marking Suite</title>
+    <!-- Linking modular CSS -->
     <link rel="stylesheet" href="styles.css">
     <!-- Google Fonts for professional Inter typeface -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -18,9 +19,8 @@
             <h2>Psych Marker 2027</h2>
         </header>
         
-        <div id="nav-container">
-            <!-- JavaScript will inject official Paper sections here -->
-        </div>
+        <!-- Sidebar links are injected here by app.js -->
+        <div id="nav-container"></div>
 
         <div class="nav-cat">Tools</div>
         <ul>
@@ -28,36 +28,52 @@
             <li><a onclick="nav('help')" id="btn-help">Help & Pedagogy</a></li>
         </ul>
 
+        <!-- Batch Marking Controls -->
         <div style="padding: 10px 20px;">
-            <button class="btn btn-orange" onclick="resetRubrics()">Reset Student Marking</button>
-            <button class="btn btn-red" onclick="resetAll()">Full Reset (New Task)</button>
+            <button class="btn btn-orange" onclick="resetRubrics()" title="Keeps question text, wipes marks for next student">Reset Student Marking</button>
+            <button class="btn btn-red" onclick="resetAll()" title="Wipes everything including question prompts">Full Reset (New Task)</button>
         </div>
     </nav>
 
     <!-- Main Content Rendering Area -->
     <main class="container">
         <div id="active-view-container">
-            <!-- app.js will inject rubrics, questions, and comments here -->
+            <!-- Rubrics, Question Fields, and Manual Overrides are injected here -->
             <div style="text-align: center; margin-top: 100px; color: #94a3b8;">
-                <h3>Initializing Best-Fit Engine...</h3>
+                <h3>Initializing Best-Fit Assessment Engine...</h3>
             </div>
         </div>
     </main>
 
-    <!-- Floating Best-Fit / Summative Mark Bar -->
+    <!-- Floating Score Bar with Logic Tooltip -->
     <div class="dock-bar">
         <div class="fit-info">
             <h3 id="fit-title">Select descriptors...</h3>
-            <p id="fit-logic">Select a radio button in each strand to calculate a best-fit estimate.</p>
+            <!-- This text is mirrored into the tooltip below -->
+            <p id="fit-logic">Best-fit for exams; Summative for IA.</p>
         </div>
-        <div class="res-box">
+        <div class="res-box" id="logic-box" data-tooltip="Hover here after selecting strands to see mathematical logic.">
             <span class="res-val" id="score-out">0</span>
-            <span class="res-lbl">Total Mark / Range</span>
+            <span class="res-lbl">Total Mark / Best-Fit</span>
         </div>
     </div>
 
-    <!-- Modular Script Order -->
+    <!-- Modular Script Order: Data first, then Engine -->
     <script src="rubrics.js"></script>
     <script src="app.js"></script>
+
+    <!-- Dynamic Tooltip Sync Script -->
+    <script>
+        // Observes changes in the logic text and updates the hover tooltip instantly
+        const observer = new MutationObserver(() => {
+            const tipText = document.getElementById('fit-logic').innerText;
+            document.getElementById('logic-box').setAttribute('data-tooltip', tipText);
+        });
+        observer.observe(document.getElementById('fit-logic'), { 
+            childList: true, 
+            characterData: true, 
+            subtree: true 
+        });
+    </script>
 </body>
 </html>

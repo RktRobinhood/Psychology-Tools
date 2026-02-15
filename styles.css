@@ -334,20 +334,25 @@ textarea {
     cursor: help;
 }
 
+/* Logic Tooltip using the data-tooltip attribute */
 .res-box:hover::after {
-    content: "Hover marking to see mathematical logic.";
+    content: attr(data-tooltip);
     position: absolute;
-    bottom: 100%;
+    bottom: 120%;
     left: 50%;
     transform: translateX(-50%);
     background: #1e293b;
     color: white;
-    padding: 8px 12px;
-    font-size: 0.7rem;
-    border-radius: 6px;
-    white-space: nowrap;
-    margin-bottom: 10px;
+    padding: 12px 18px;
+    font-size: 0.75rem;
+    border-radius: 8px;
+    white-space: normal;
+    width: 280px;
+    line-height: 1.4;
     font-weight: normal;
+    box-shadow: 0 10px 15px rgba(0,0,0,0.2);
+    z-index: 3000;
+    text-align: left;
 }
 
 .res-val {
@@ -364,12 +369,6 @@ textarea {
     text-transform: uppercase;
     display: block;
     margin-top: 5px;
-}
-
-/* Logic note styling in the dock */
-#fit-logic {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-size: 0.75rem;
 }
 
 /* Help View Styling */
